@@ -9,23 +9,56 @@ Pause between dots and dashes in a character – is 1 time unit long.
 Pause between characters inside a word – is 3 time units long.
 Pause between words – is 7 time units long.
 """
-__author__ = 'Bethany Folino'
+__author__ = 'Bethany Folino with help from Jacob Short'
 
 from morse_dict import MORSE_2_ASCII
+from morse_dict import bits_2_morse
 
 
 def decode_bits(bits):
-    # morse = MORSE_2_ASCII.items()
-    # keys = str(morse.keys())
-    # vals = str(morse.values())
-    # translated = bits.maketrans(keys, vals)
-    # return translated
-    return
+    bits = bits.strip("0")
+    bit_list = []
+    result_list = []
+    bit_string = ""
+    result_string = ""
+    min_len = 999999
+    for bit in bits:
+        if not bit_string and bit == "1":
+            bit_string += bit
+        elif bit == bit_string[-1]:
+            bit_string += bit
+        else:
+            bit_list.append(bit_string)
+            bit_string = bit
+    bit_list.append(bit_string)
+
+    # smallest string length
+    for bit in bit_list:
+        if len(bit) < min_len:
+            min_len = len(bit)
+    # divide each word by multiplier
+    for ele in bit_list:
+        division = len(ele) / float(min_len)
+        c = [ele[int(round(division * i)):
+             int(round(division * (i + 1)))] for i in range(min_len)]
+        result_list.append(c[0])
+
+    for result in result_list:
+        if result in bits_2_morse:
+            morse = bits_2_morse.get(result)
+            result_string += morse
+    return result_string
 
 
 def decode_morse(morse):
-    # your code here
-    return
+    result = ""
+    for word in morse.split("   "):
+        for char in word.split():
+            if char in MORSE_2_ASCII:
+                decode = MORSE_2_ASCII.get(char)
+                result += decode
+        result += " "
+    return result.strip()
 
 
 if __name__ == '__main__':
